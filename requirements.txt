@@ -5,3 +5,4 @@ chatterbot_corpus
 nltk
 sqlalchemy
 flask
+spacy
