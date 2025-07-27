@@ -1,40 +1,39 @@
-from fastapi import FastAPI, Request, Form
+from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse, JSONResponse
-from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
-from chatterbot import ChatBot
-from chatterbot.trainers import ListTrainer
 from pathlib import Path
+from chatterbot import ChatBot
+from chatterbot.trainers import ChatterBotCorpusTrainer
 import uvicorn
 
 # === Setup ===
 app = FastAPI()
 BASE_DIR = Path(__file__).resolve().parent
-templates = Jinja2Templates(directory=str(BASE_DIR))
 
-# === ChatBot Setup ===
-
+# === ChatBot ===
 chatbot = ChatBot(
     "ASH-1",
     storage_adapter='chatterbot.storage.SQLStorageAdapter',
-    database_uri='sqlite:///main/ASH-1.sqlite3'  # Path relative to current script
+    database_uri=f"sqlite:///{BASE_DIR}/ASH-1.sqlite3"
 )
 
-# === Routes ===
+# === Trainer ===
+trainer = ChatterBotCorpusTrainer(chatbot)
+trainer.train(str(BASE_DIR / "ash_corpus.yaml"))
+
+# === HTML Response ===
 @app.get("/", response_class=HTMLResponse)
-async def get_chat_page(request: Request):
+async def get_page(request: Request):
     return HTMLResponse(content=html_code, status_code=200)
 
 class ChatMessage(BaseModel):
     message: str
 
 @app.post("/chat")
-async def get_response(msg: ChatMessage):
-    response = chatbot.get_response(msg.message)
-    return JSONResponse(content={"response": str(response)})
+async def chat(msg: ChatMessage):
+    reply = chatbot.get_response(msg.message)
+    return JSONResponse(content={"response": str(reply)})
 
-# === HTML + CSS + JS ===
 html_code = """
 <!DOCTYPE html>
 <html>
@@ -42,34 +41,27 @@ html_code = """
     <title>ASH-1 ChatBot</title>
     <style>
         body {
-            background: #1a1a1a;
-            font-family: Arial, sans-serif;
-            color: #fff;
+            background: #111;
+            font-family: Arial;
+            color: #eee;
             display: flex;
             flex-direction: column;
             align-items: center;
             margin-top: 30px;
         }
-        h1 {
-            color: #00ffcc;
-        }
         #chat-box {
             width: 90%%;
             max-width: 600px;
             height: 400px;
-            border: 1px solid #444;
-            background: #111;
+            border: 1px solid #333;
+            background: #1a1a1a;
             padding: 10px;
             overflow-y: scroll;
             margin-bottom: 20px;
             border-radius: 8px;
         }
-        .user {
-            color: #00ffcc;
-        }
-        .bot {
-            color: #ffcc00;
-        }
+        .user { color: #00ffff; }
+        .bot { color: #ffcc00; }
         #chat-form {
             width: 90%%;
             max-width: 600px;
@@ -80,16 +72,15 @@ html_code = """
             padding: 10px;
             border: none;
             border-radius: 8px 0 0 8px;
-            outline: none;
         }
         #send-btn {
-            padding: 10px 20px;
-            background: #00ffcc;
+            padding: 10px;
+            background: #00ffff;
             border: none;
             color: #000;
+            border-radius: 0 8px 8px 0;
             font-weight: bold;
             cursor: pointer;
-            border-radius: 0 8px 8px 0;
         }
     </style>
 </head>
@@ -100,7 +91,6 @@ html_code = """
         <input type="text" id="msg-input" placeholder="Type your message..." required />
         <button id="send-btn">Send</button>
     </form>
-
     <script>
         async function sendMessage(event) {
             event.preventDefault();
