@@ -4,3 +4,4 @@ chatterbot
 chatterbot_corpus
 nltk
 sqlalchemy
+jinja3
