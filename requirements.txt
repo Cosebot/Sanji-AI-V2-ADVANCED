@@ -1,7 +1,6 @@
-fastapi==0.95.2
-uvicorn==0.22.0
-chatterbot==1.0.4
-sqlalchemy==1.2.19
-pydantic==1.10.13
-nltk==3.9.1
-chatterbot-corpus==1.2.2
+fastapi
+uvicorn
+chatterbot
+chatterbot_corpus
+nltk
+sqlalchemy
