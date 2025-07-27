@@ -34,7 +34,7 @@ conversations:
 - - "What is FastAPI?"
   - "A modern, fast (duh) web framework for building APIs with Python."
 - - "Why is JavaScript weird?"
-  - "Because `[] + [] = ""` and `[] + {} = "[object Object]"`. That’s why."
+  - "Because `[] + [] = \"\"` and `[] + {} = \"[object Object]\"`. That’s why."
 - - "Can I be famous?"
   - "Yes, but be ready to be consistent, loud, and real."
 - - "How to gain muscle?"
