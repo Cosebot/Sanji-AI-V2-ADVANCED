@@ -2,7 +2,7 @@
 
 import requests
 from bs4 import BeautifulSoup
-from duckduckgo_search.ddg import DDGS
+from duckduckgo_search import DDGS
 from sumy.parsers.plaintext import PlaintextParser
 from sumy.nlp.tokenizers import Tokenizer
 from sumy.summarizers.text_rank import TextRankSummarizer
