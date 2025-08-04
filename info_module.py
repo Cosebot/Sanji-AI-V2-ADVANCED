@@ -9,15 +9,16 @@ from sumy.summarizers.text_rank import TextRankSummarizer
 
 import traceback
  
-
 def search_web(query, num_results=3):
     try:
         with DDGS() as ddgs:
-    results = ddgs.text(query, max_results=5)
-        links = [r['href'] for r in results if 'href' in r and r['href'].startswith("http")]
-        if not links:
-            raise Exception("No links found.")
-        return links
+            results = ddgs.text(query, max_results=num_results)
+            links = [r['href'] for r in results if 'href' in r and r['href'].startswith("http")]
+
+            if not links:
+                raise Exception("No links found.")
+            return links
+
     except Exception as e:
         print("Search Error:", e)
         traceback.print_exc()
