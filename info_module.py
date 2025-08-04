@@ -6,24 +6,20 @@ from duckduckgo_search import DDGS
 from sumy.parsers.plaintext import PlaintextParser
 from sumy.nlp.tokenizers import Tokenizer
 from sumy.summarizers.text_rank import TextRankSummarizer
-
 import traceback
- 
+
 def search_web(query, num_results=3):
     try:
         with DDGS() as ddgs:
             results = ddgs.text(query, max_results=num_results)
             links = [r['href'] for r in results if 'href' in r and r['href'].startswith("http")]
-
             if not links:
                 raise Exception("No links found.")
             return links
-
     except Exception as e:
         print("Search Error:", e)
         traceback.print_exc()
         return []
-
 
 def extract_text(url):
     try:
@@ -31,10 +27,15 @@ def extract_text(url):
         if res.status_code != 200:
             raise Exception(f"Non-200 response: {res.status_code}")
         soup = BeautifulSoup(res.text, 'html.parser')
+
+        # Try grabbing paragraphs first
         paras = soup.find_all('p')
-        if not paras:
-            raise Exception("No <p> tags found.")
-        text = ' '.join(p.get_text(strip=True) for p in paras)
+        if paras:
+            text = ' '.join(p.get_text(strip=True) for p in paras)
+        else:
+            # Fallback: grab all text content
+            text = soup.get_text(separator=' ', strip=True)
+
         if len(text) < 100:
             raise Exception("Extracted text too short.")
         return text
@@ -42,11 +43,10 @@ def extract_text(url):
         print(f"[ERROR] Failed to extract from {url}: {e}")
         return ""
 
-
 def summarize_text(text, sentence_count=4):
     try:
         if len(text.split()) < 50:
-            return text  # Text too short to summarize, return as-is
+            return text  # Too short to summarize, return as-is
         parser = PlaintextParser.from_string(text, Tokenizer("english"))
         summarizer = TextRankSummarizer()
         summary = summarizer(parser.document, sentence_count)
@@ -56,8 +56,7 @@ def summarize_text(text, sentence_count=4):
         return output
     except Exception as e:
         print(f"[ERROR] Summarization failed: {e}")
-        return text[:300] + "..."  # Fallback: first 300 chars
-
+        return text[:300] + "..."  # Fallback: return first 300 chars
 
 def confirm_facts(summary_list):
     try:
@@ -75,7 +74,6 @@ def confirm_facts(summary_list):
     except Exception as e:
         print("[WARN] Fact confirmation failed:", e)
         return ' '.join(summary_list[:2]) + '.'
-
 
 def info_pipeline(query):
     try:
