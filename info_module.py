@@ -2,17 +2,18 @@
 
 import requests
 from bs4 import BeautifulSoup
-from duckduckgo_search import DuckDuckGoSearch
+from duckduckgo_search.ddg import DDGS
 from sumy.parsers.plaintext import PlaintextParser
 from sumy.nlp.tokenizers import Tokenizer
 from sumy.summarizers.text_rank import TextRankSummarizer
 
 import traceback
-
+ 
 
 def search_web(query, num_results=3):
     try:
-        results = DuckDuckGoSearch().search("your query", max_results=3)
+        with DDGS() as ddgs:
+    results = ddgs.text(query, max_results=5)
         links = [r['href'] for r in results if 'href' in r and r['href'].startswith("http")]
         if not links:
             raise Exception("No links found.")
