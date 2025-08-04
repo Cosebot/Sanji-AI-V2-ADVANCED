@@ -33,7 +33,7 @@ class InfoQuery(BaseModel):
 # === Routes ===
 @app.get("/", response_class=HTMLResponse)
 async def get_page(request: Request):
-    return HTMLResponse(content=chat_html, status_code=200)
+    return HTMLResponse(content=html_code, status_code=200)
 
 @app.post("/chat")
 async def chat(msg: ChatMessage):
