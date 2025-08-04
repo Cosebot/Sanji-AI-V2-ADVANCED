@@ -7,7 +7,7 @@ from chatterbot.trainers import ChatterBotCorpusTrainer
 import uvicorn
 
 from info_module import info_pipeline
-from sanji_ui import chat_html
+from sanji_ui import html_code
 
 app = FastAPI()
 BASE_DIR = Path(__file__).resolve().parent
