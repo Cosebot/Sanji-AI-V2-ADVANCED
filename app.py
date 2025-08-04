@@ -255,11 +255,13 @@ html_code = '''<!DOCTYPE html>
       chatContainer.appendChild(userBubble);
       scrollToBottom();
 
-      fetch("/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: msg })
-      })
+      const isQuestion = msg.endsWith("?") || /^(who|what|when|where|how|why)/i.test(msg);
+
+fetch(isQuestion ? "/ask" : "/chat", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify(isQuestion ? { query: msg } : { message: msg })
+})
       .then(res => res.json())
       .then(data => {
         const aiBubble = document.createElement("div");
