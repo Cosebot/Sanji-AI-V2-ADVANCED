@@ -34,7 +34,7 @@ async def chat(msg: ChatMessage):
     reply = chatbot.get_response(msg.message)
     return JSONResponse(content={"response": str(reply)})
 
-html_code = <!DOCTYPE html>
+html_code = '''<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
