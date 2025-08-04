@@ -262,7 +262,7 @@ html_code = '''<!DOCTYPE html>
   </script>
 </body>
 </html>
-"""
+'''
 
 # === Run Server ===
 if __name__ == "__main__":
