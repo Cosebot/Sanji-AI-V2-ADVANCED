@@ -6,6 +6,9 @@ from chatterbot import ChatBot
 from chatterbot.trainers import ChatterBotCorpusTrainer
 import uvicorn
 
+# === Sanji Brain ===
+from info_module import info_pipeline
+
 # === Setup ===
 app = FastAPI()
 BASE_DIR = Path(__file__).resolve().parent
@@ -21,18 +24,34 @@ chatbot = ChatBot(
 trainer = ChatterBotCorpusTrainer(chatbot)
 trainer.train(str(BASE_DIR / "ash_corpus.yaml"))
 
-# === HTML Response ===
+# === HTML Page Content ===
+from sanji_ui import chat_html  # assuming you've moved the big HTML string to `sanji_ui.py`
+
 @app.get("/", response_class=HTMLResponse)
 async def get_page(request: Request):
-    return HTMLResponse(content=html_code, status_code=200)
+    return HTMLResponse(content=chat_html, status_code=200)
 
+# === Models ===
 class ChatMessage(BaseModel):
     message: str
 
+class InfoQuery(BaseModel):
+    query: str
+
+# === Chat Endpoint ===
 @app.post("/chat")
 async def chat(msg: ChatMessage):
     reply = chatbot.get_response(msg.message)
     return JSONResponse(content={"response": str(reply)})
+
+# === Info Search Endpoint ===
+@app.post("/ask")
+async def ask_info(q: InfoQuery):
+    result = info_pipeline(q.query)
+    return JSONResponse(content={
+        "response": result["answer"],
+        "sources": result["sources"]
+    })
 
 html_code = '''<!DOCTYPE html>
 <html lang="en">
