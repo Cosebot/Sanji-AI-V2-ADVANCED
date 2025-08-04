@@ -7,3 +7,7 @@ sqlalchemy
 flask
 spacy
 pyyaml
+requests
+beautifulsoup4
+duckduckgo-search
+sumy
